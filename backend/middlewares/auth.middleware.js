@@ -1,4 +1,4 @@
-import { findUserById } from "../dao/user.dao";
+import { findUserById } from "../dao/user.dao.js";
 import jwt from "jsonwebtoken";
 
 export const authMiddleware = async(req, res, next) => {
