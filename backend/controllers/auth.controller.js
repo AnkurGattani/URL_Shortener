@@ -1,7 +1,7 @@
 import  User  from '../models/user.model.js';
 import jwt from 'jsonwebtoken';
 import { cookieOptions } from '../config/config.js';
-import { findUserByEmail } from '../dao/user.dao.js';
+import { findUserByEmail, findUserById } from '../dao/user.dao.js';
 
 // functions to generate access and refresh tokens
 const generateAccessToken = (user) => {
@@ -115,7 +115,7 @@ const loginUser = async(req, res) => {
 
 const logoutUser = async(req, res) => {
     try {
-        User.findByIdAndUpdate(req.user._id, 
+        await User.findByIdAndUpdate(req.user._id, 
             { $unset: {
                 refreshToken: 1, // remove refreshToken field from user
                 }, 
@@ -145,7 +145,7 @@ const refreshAccessToken = async(req, res) => {
 
     try {
         const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
-        const user = await User.findById(decodedToken?._id);
+        const user = findUserById(decodedToken?._id);
         if(!user) {
             return res.status(401).json({ message: "Invalid refresh token"});
         }
@@ -171,4 +171,10 @@ const refreshAccessToken = async(req, res) => {
     }
 }
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken };
+const getCurrentUser = async(req, res) => {
+    return res.status(200).json({
+        user: req.user
+    })
+}
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, getCurrentUser };
