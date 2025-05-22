@@ -18,12 +18,15 @@ const userSchema = new mongoose.Schema(
         password: {
             type: String, 
             required: true
+        }, 
+        refreshToken: {
+            type: String,
         }
     }, 
     { timestamps: true }
 );
 
-userSchema.pre("save", async (next) => {
+userSchema.pre("save", async function(next) {
     if(!this.isModified('password'))    // if password(this) is not modified, return to next step (proceed further)
         return next();
 
@@ -34,7 +37,7 @@ userSchema.pre("save", async (next) => {
 });
 
 // Define 'matchPassword' method to compare while logging in, the entered password with the stored, hashed Password
-userSchema.methods.matchPassword = async (enteredPassword) => {
+userSchema.methods.matchPassword = async function(enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
